@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QCM Biodiversité CM1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE everyday study tool, calm and clear
+   IDEA a stained histology slide: hematoxylin violet + eosin pink, like the cours' coupes
+   PICTURE the live question card itself, large, with a progress strip of cells
+   COLOUR violet #2b1d6e band, white card, eosin #e2457a accent, teal for right, eosin-red for wrong
+   TYPE Sora 700 titles + Source Sans 3 text
+   LAYOUT violet band with title + progress, card overlapping below; phone: single column */
+:root{color-scheme:light dark;--bg:light-dark(#f6f3fb,#120d26);--card:light-dark(#ffffff,#1d1640);--ink:light-dark(#1a1433,#efeaff);--soft:light-dark(#5c5677,#b5aed3);--line:light-dark(#e2dcef,#352c63);--band:light-dark(#2b1d6e,#1b1250);--eo:#e2457a;--eo-soft:light-dark(#fde6ee,#43183a);--ok:light-dark(#0b7a5f,#4fd1a5);--ok-soft:light-dark(#e2f5ee,#123a30);--ko:light-dark(#c42a4f,#ff7d98);--ko-soft:light-dark(#fde6ea,#46172a)}
+:root[data-theme=light]{color-scheme:light}
+:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:17px/1.55 "Source Sans 3",system-ui,sans-serif;overflow-x:clip}
+.band{background:var(--band);color:#fff;padding:clamp(28px,4vw,52px) max(5vw,16px) 96px}
+.wrap{max-width:860px;margin:0 auto}
+h1{font:700 clamp(30px,5vw,46px)/1.05 Sora,system-ui,sans-serif;letter-spacing:-.02em;margin:0 0 10px;text-wrap:balance}
+.lede{margin:0;color:#d9d2ff;max-width:62ch}
+.lede b{color:#fff}
+.cells{display:grid;grid-template-columns:repeat(var(--n,20),minmax(0,1fr));gap:4px;margin-top:26px}
+.cell{height:12px;border-radius:3px;background:rgba(255,255,255,.18);border:0;padding:0;cursor:pointer}
+.cell.star{box-shadow:inset 0 -3px 0 #ffb6cc}
+.cell.cur{background:#fff}
+.cell.ok{background:#4fd1a5}
+.cell.ko{background:#ff7d98}
+.meta{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:10px;font-size:15px;color:#d9d2ff}
+.main{padding:0 max(5vw,16px) 56px;margin-top:-72px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:clamp(20px,3.5vw,36px);box-shadow:0 10px 30px rgba(20,10,60,.12)}
+.tag{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600;color:var(--soft);margin-bottom:10px}
+.tag .st{color:var(--eo);font-size:16px}
+.q{font:600 clamp(21px,2.6vw,26px)/1.25 Sora,system-ui,sans-serif;letter-spacing:-.01em;margin:0 0 20px;text-wrap:pretty}
+.opts{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.opt{width:100%;display:flex;gap:14px;align-items:flex-start;text-align:left;font:inherit;color:inherit;background:transparent;border:1.5px solid var(--line);border-radius:12px;padding:13px 16px;min-height:52px;cursor:pointer;transition:border-color .15s,background .15s}
+.opt:hover:not([disabled]){border-color:var(--eo);background:var(--eo-soft)}
+.opt:focus-visible,.btn:focus-visible,.cell:focus-visible{outline:3px solid var(--eo);outline-offset:2px}
+.opt .k{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:14px;border:1.5px solid var(--line);color:var(--soft)}
+.opt[disabled]{cursor:default}
+.opt.right{border-color:var(--ok);background:var(--ok-soft)}
+.opt.right .k{background:var(--ok);border-color:var(--ok);color:#fff}
+.opt.wrong{border-color:var(--ko);background:var(--ko-soft)}
+.opt.wrong .k{background:var(--ko);border-color:var(--ko);color:#fff}
+.opt.dim{opacity:.55}
+.hint{margin-top:14px}
+.hint summary{cursor:pointer;color:var(--soft);font-size:15px;font-weight:600}
+.hint p{margin:6px 0 0;color:var(--soft)}
+.fb{margin-top:18px;border-left:4px solid var(--ok);background:var(--ok-soft);border-radius:0 12px 12px 0;padding:14px 18px}
+.fb.no{border-color:var(--ko);background:var(--ko-soft)}
+.fb strong{display:block;margin-bottom:4px}
+.fb p{margin:0}
+.nav{display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between;align-items:center;margin-top:22px}
+.btn{font:600 16px "Source Sans 3",system-ui,sans-serif;border-radius:999px;padding:11px 22px;min-height:46px;cursor:pointer;border:1.5px solid var(--line);background:transparent;color:var(--ink)}
+.btn.main-b{background:var(--eo);border-color:var(--eo);color:#fff}
+.btn[disabled]{opacity:.4;cursor:default}
+.keys{font-size:14px;color:var(--soft)}
+.score{display:grid;grid-template-columns:auto minmax(0,1fr);gap:clamp(18px,4vw,40px);align-items:center}
+.ring{width:clamp(120px,22vw,170px);aspect-ratio:1;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--ok) calc(var(--p)*1%),var(--line) 0)}
+.ring span{width:76%;aspect-ratio:1;border-radius:50%;background:var(--card);display:grid;place-items:center;font:700 clamp(30px,5vw,42px)/1 Sora,sans-serif;white-space:nowrap}
+.score h2{font:700 clamp(26px,3.4vw,34px)/1.1 Sora,sans-serif;margin:0 0 8px;letter-spacing:-.02em}
+.score p{margin:0;color:var(--soft)}
+.split{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px;font-size:15px}
+.split div{border:1px solid var(--line);border-radius:12px;padding:10px 14px}
+.split b{font-size:20px;white-space:nowrap}
+.review{margin-top:28px}
+.review h3{font:700 20px/1.2 Sora,sans-serif;margin:0 0 12px}
+.rv{border-top:1px solid var(--line);padding:14px 0}
+.rv .rq{font-weight:600;margin:0 0 6px}
+.rv .ra{margin:0 0 4px;font-size:15px}
+.rv .ra.y{color:var(--ko)}
+.rv .ra.g{color:var(--ok)}
+.rv .rx{margin:0;color:var(--soft);font-size:15px}
+.foot{max-width:860px;margin:18px auto 0;font-size:14px;color:var(--soft)}
+@media(max-width:600px){.cells{gap:3px}.cell{height:10px}.score{grid-template-columns:minmax(0,1fr);justify-items:start}.split{grid-template-columns:minmax(0,1fr)}.keys{display:none}.nav .btn{flex:1 1 auto}}
+@media(prefers-reduced-motion:no-preference){.card{animation:in .25s ease-out}@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}}
+</style>
+</head>
+<body>
+<header class="band">
+  <div class="wrap">
+    <h1>UE CHANGE : Crise de la biodiversité</h1>
+    <p class="lede">Définitions, extinctions, indicateurs (LPI, aires, homogénéisation), causes IPBES et services écosystémiques. 22 questions basées sur les objectifs et conclusions du cours.</p>
+    <div class="cells" id="cells" aria-label="Progression"></div>
+    <div class="meta"><span id="pos"></span><span id="pts"></span></div>
+  </div>
+</header>
+<main class="main">
+  <div class="wrap"><section class="card" id="card" aria-live="polite"></section></div>
+  <p class="foot">Les réponses sont mélangées à chaque lancement et équilibrées en longueur : la plus longue n'est pas plus souvent la bonne. À l'examen, une question peut avoir plusieurs bonnes réponses.</p>
+</main>
+<script>
+{
+const Q0=[{"c": 1, "s": 0, "d": "Diapo 3", "p": "Selon la Convention sur la Diversité Biologique (Rio, 1992), quels sont les trois niveaux d'organisation inclus dans la biodiversité ?", "o": ["Diversité des climats, diversité des sols et diversité des espèces", "Diversité intraspécifique, diversité spécifique et des écosystèmes", "Diversité des vertébrés, diversité des plantes et des invertébrés", "Diversité indigène, diversité exotique et diversité agricole"], "x": "La définition de Rio (1992) couvre la variabilité des organismes vivants de toute origine, comprenant la diversité au sein des espèces (génétique/intraspécifique), entre les espèces (spécifique) ainsi que celle des écosystèmes dont ils font partie.", "h": "Pense aux trois échelles du vivant : gènes, espèces et écosystèmes."}, {"c": 0, "s": 0, "d": "Diapo 4", "p": "Dans l'approche hiérarchique de Noss (1990), quelles sont les trois dimensions complémentaires de la biodiversité ?", "o": ["Compositionnelle, structurelle et fonctionnelle", "Génétique, démographique et biogéographique", "Terrestre, dulçaquicole et strictement marine", "Indigène, endémique et exotique envahissante"], "x": "Noss (1990) articule la biodiversité en trois sphères imbriquées : compositionnelle (gènes, espèces, communautés, types de paysages), structurelle (organisation spatiale des habitats, structures génétiques et populationnelles) et fonctionnelle (processus génétiques, démographiques, interactions interspécifiques et perturbations).", "h": "Les trois cercles verts du schéma : composition, structure et fonctions."}, {"c": 2, "s": 0, "d": "Diapo 6", "p": "Combien d'espèces sont actuellement connues sur Terre par rapport à l'estimation conservatrice citée dans le cours ?", "o": ["Environ 9 000 espèces connues pour 1,76 million d'espèces estimées", "Environ 13,6 millions d'espèces connues pour 50 millions estimées", "Environ 1,76 million d'espèces connues pour 13,6 millions estimées", "Environ 5 millions d'espèces connues pour 50 millions d'espèces estimées"], "x": "On connaît environ 1,76 à 2 millions d'espèces (Carl von Linné en a décrit 9 000 à lui seul), alors que le total sur Terre est estimé entre 5 et 50 millions, 13,6 millions étant une estimation conservatrice.", "h": "Nous ne connaissons qu'une petite fraction (~15 %) de l'estimation conservatrice."}, {"c": 3, "s": 0, "d": "Diapo 6", "p": "Parmi les biais connus de notre inventaire de la biodiversité mondiale, quelle tendance est exacte ?", "o": ["Les zones tropicales et les milieux marins sont les mieux étudiés", "Les gènes et les invertébrés sont mieux connus que les vertébrés", "Les milieux marins et les plantes sont mieux connus que le terrestre", "Les vertébrés et les zones tempérées sont nettement mieux connus"], "x": "La diapo 6 liste quatre biais majeurs de connaissance : espèces > gènes, biodiversité terrestre > marine, vertébrés > plantes et invertébrés, et zones tempérées > zones tropicales (alors que la richesse réelle est maximale sous les tropiques).", "h": "On connaît mieux ce qui est grand, terrestre et proche des pays tempérés."}, {"c": 1, "s": 0, "d": "Diapo 7", "p": "Que démontre l'exemple des 12 lépidoptères représentant seulement 7 espèces (Papilio, Pararge, Amauris…) ?", "o": ["Deux papillons d'aspect identique forment toujours une même espèce", "La morphologie seule trompe : mimétisme, saisons et espèces jumelles", "Des populations vivant en Ouganda se reproduisent toujours ensemble", "La couleur des ailes dépend uniquement du sexe chez les papillons"], "x": "L'exemple illustre la difficulté de délimiter une espèce par le seul aspect : variations climatiques/alimentaires (Agrius convolvuli), formes saisonnières sèche/humide (Melonita leda), races géographiques (Pararge egeria), dimorphisme sexuel et mimétisme (Papilio dardanus imitant Amauris niavius), ou au contraire deux espèces presque identiques incapables de se reproduire entre elles en Ouganda (Papilio socia et P. bromius).", "h": "Pense à la fois aux faux amis (mimétisme/espèces jumelles) et aux formes très différentes d'une même espèce."}, {"c": 0, "s": 0, "d": "Diapos 8-9", "p": "Selon le Millennium Ecosystem Assessment (2005), quel empire biogéographique et quel biome abritent le plus d'espèces et d'endémiques ?", "o": ["L'empire néotropical et les forêts tropicales humides (TMF)", "L'empire paléarctique et les forêts tempérées mixtes (TeBF)", "L'empire néarctique et les forêts boréales de taïga (BF)", "L'empire australasien et les toundras polaires froides (T)"], "x": "Sur les graphiques de la diapo 9 (8 empires, 14 biomes), l'empire néotropical domine très nettement en nombre d'espèces et d'espèces endémiques, tout comme le biome des forêts tropicales et subtropicales humides (TMF). Le Paléarctique (entouré en orange) et les forêts tempérées (TeBF) sont beaucoup moins riches en espèces et surtout très pauvres en endémisme.", "h": "L'Amérique du Sud tropicale concentre les records de richesse et d'endémisme."}, {"c": 2, "s": 0, "d": "Diapo 11", "p": "Quels sont les deux critères stricts définissant un « hotspot » de biodiversité, et quelle part de la surface terrestre représentent-ils ?", "o": ["> 150 espèces endémiques et < 70 % de végétation sauvegardée (23 % des terres)", "> 1 500 espèces menacées et < 50 % de forêts primaires restantes (10 % des terres)", "> 1 500 espèces endémiques et < 30 % de végétation sauvegardée (2,3 % des terres)", "> 500 espèces endémiques et < 10 % de végétation naturelle intacte (5 % des terres)"], "x": "Un hotspot associe valeur patrimoniale et menace (Valeur + risque = Enjeu) selon deux critères stricts : plus de 1 500 espèces endémiques ET moins de 30 % de la végétation naturelle sauvegardée. Ces zones ne couvrent que 2,3 % de la surface terrestre mais abritent plus de la moitié des plantes endémiques mondiales.", "h": "Retiens les seuils 1 500 endémiques, 30 % restants et une surface minuscule de 2,3 %."}, {"c": 3, "s": 0, "d": "Diapo 12", "p": "Sur la Liste Rouge de l'UICN, quelles trois catégories regroupent les espèces officiellement qualifiées de « menacées » ?", "o": ["EX (Éteinte), EW (Éteinte à l'état sauvage) et CR (Critique)", "VU (Vulnérable), NT (Quasi menacée) et LC (Mineure)", "EW (Éteinte sauvage), CR (Critique) et EN (En danger)", "CR (En danger critique), EN (En danger) et VU (Vulnérable)"], "x": "L'accolade « MENACÉE » de la Liste Rouge UICN (diapo 12) couvre exactement trois statuts : CR (Critically Endangered), EN (Endangered) et VU (Vulnerable). EX et EW sont déjà éteintes (au moins à l'état sauvage), tandis que NT et LC ne sont pas encore classées menacées.", "h": "Les trois cercles rouge, orange et jaune situés au centre de l'échelle."}, {"c": 0, "s": 0, "d": "Diapos 13-14", "p": "Comment définit-on une extinction de masse par rapport au taux naturel d'extinction issu du registre fossile ?", "o": ["Perte d'au moins 75 % des espèces en moins de 2 millions d'années", "Perte d'au moins 30 % des espèces en moins de 10 millions d'années", "Perte d'au moins 65 % des espèces sur 100 millions d'années environ", "Perte d'au moins 10 % des espèces sur une période d'un million d'années"], "x": "Une extinction de masse correspond à la disparition d'au moins 75 % des espèces sur une période géologiquement courte (généralement < 2 millions d'années), comme les « Big Five » (dont 96 % à la fin du Permien il y a 250 Ma). Les taux naturels (background rates) sont bien plus lents : ~10 % par 1 Ma, 30 % par 10 Ma et 65 % par 100 Ma.", "h": "Les trois autres propositions reprennent justement les taux naturels de la diapo 13."}, {"c": 1, "s": 0, "d": "Diapos 15 et 17", "p": "Selon Barnosky et al. (2011) et la conclusion du cours, où en sommes-nous face à une 6e extinction de masse ?", "o": ["Le seuil des 75 % est déjà dépassé chez les mammifères et oiseaux", "Taux 100 à 1 000 fois au-dessus du naturel, mais 75 % pas atteints", "Les taux actuels restent proches du taux naturel observé en fossiles", "Le seuil des 75 % est atteint partout sauf chez les gastéropodes"], "x": "Les taux d'extinction actuels dépassent déjà de 100 à 1 000 fois le taux naturel et continuent d'augmenter, mais le seuil des 75 % d'une extinction de masse n'est pas encore atteint (il reste du temps pour l'éviter). Toutefois, si toutes les espèces actuellement menacées s'éteignent, plusieurs taxons s'en approcheront très vite (Cycadopsida 64 %, Gastropoda 56 %, Bivalvia 47 %, Amphibia 31 %).", "h": "La réponse du cours à « Nous vivons une 6e extinction de masse » commence par « Pas encore, mais… »."}, {"c": 2, "s": 0, "d": "Diapos 16-17", "p": "Combien de temps la diversité biologique met-elle à se rétablir après une extinction de masse, et par quel mécanisme ?", "o": ["Environ 10 000 à 50 000 ans par simple migration géographique locale", "Environ 1 à 2 millions d'années par homogénéisation biotique globale", "Environ 15 à 30 millions d'années par spéciation et radiation évolutive", "Environ 100 à 200 ans par sélection naturelle sur espèces communes"], "x": "Après chaque extinction de masse, la biodiversité se reconstitue par spéciation (allopatrique par isolement géographique, ou sympatrique par isolement reproductif) et radiation évolutive. Mais le temps de récupération est estimé à 15–30 millions d'années : beaucoup trop long pour concerner l'humanité.", "h": "C'est une échelle en dizaines de millions d'années, hors de portée humaine."}, {"c": 3, "s": 0, "d": "Diapo 16", "p": "Quelle différence oppose la spéciation allopatrique à la spéciation sympatrique ?", "o": ["L'allopatrique concerne les animaux et la sympatrique les végétaux", "L'allopatrique suit un isolement reproductif, la sympatrique une barrière", "L'allopatrique survient en milieu marin, la sympatrique en milieu terrestre", "L'allopatrique repose sur une barrière géographique, la sympatrique non"], "x": "Dans la spéciation allopatrique, l'entrave au flux génique entre la population mère et la population fille est une barrière physique (isolement géographique). Dans la spéciation sympatrique, les populations restent au même endroit mais l'entrave au flux génique vient d'un isolement reproductif.", "h": "« Allo- » = ailleurs (géographie), « Sym- » = ensemble au même endroit."}, {"c": 0, "s": 0, "d": "Diapo 18", "p": "Avant même d'observer des extinctions définitives, quels sont les trois autres grands types d'indicateurs de suivi de la biodiversité ?", "o": ["Abondance des populations, aires de répartition et composition", "Taux de spéciation, biomasse fossile et surface des déserts", "Nombre de parcs nationaux, budget de recherche et température", "Vitesse de radiation évolutive, endémisme insulaire et climat"], "x": "En complément du risque d'extinction (Listes Rouges UICN), la diapo 18 met en avant trois indicateurs précoces essentiels : les déclins d'abondance (effondrements de populations, même communes), les modifications d'aires de répartition (distribution) et l'homogénéisation biotique (composition : combien d'espèces, mais aussi lesquelles).", "h": "Relis les quatre pictogrammes de la diapo 18 (dont Extinction Risk)."}, {"c": 1, "s": 0, "d": "Diapos 19-20", "p": "Que signifie précisément le déclin de −73 % affiché par le Living Planet Index (rapport WWF 2024) entre 1970 et 2020 ?", "o": ["73 % des espèces animales mondiales se sont définitivement éteintes", "La taille moyenne des populations suivies de vertébrés a chuté de 73 %", "73 % de la biomasse totale des plantes et insectes a disparu en 50 ans", "73 % des écosystèmes forestiers européens ont été détruits depuis 1970"], "x": "Piège d'interprétation majeur ! Le LPI (2024) mesure l'évolution moyenne d'abondance de 34 836 populations de 5 495 espèces de vertébrés (et non un pourcentage d'espèces éteintes, ni les insectes/plantes). Le déclin moyen atteint −73 % au global, −85 % en eau douce, −95 % en Amérique latine/Caraïbes et −76 % en Afrique.", "h": "Le LPI suit l'abondance de populations de vertébrés, pas le nombre d'espèces éteintes."}, {"c": 2, "s": 0, "d": "Diapo 22", "p": "Quels ordres de grandeur illustrent les effondrements d'abondance et de biomasse chez des espèces non rares en Europe ?", "o": ["−25 % de biomasse d'insectes volants et 40 millions d'oiseaux perdus", "−50 % de biomasse d'insectes volants et 120 millions d'oiseaux perdus", "> 75 % de baisse de biomasse d'insectes et > 400 millions d'oiseaux perdus", "−10 % de biomasse d'insectes volants et 4 milliards d'oiseaux perdus"], "x": "L'étude d'Hallmann et al. montre un déclin de plus de 75 % en 27 ans de la biomasse totale d'insectes volants, y compris dans des aires protégées. Parallèlement, l'Europe a perdu plus de 400 millions (421 millions) d'oiseaux d'espèces communes en 30 ans.", "h": "Plus des trois quarts pour les insectes volants, et plus de 400 millions pour les oiseaux communs."}, {"c": 3, "s": 0, "d": "Diapos 23-24", "p": "Sous l'effet du réchauffement, pourquoi certaines espèces subissent-elles un piège démographique malgré des déplacements d'aire ?", "o": ["Elles descendent en basse altitude où la compétition est plus forte", "Elles migrent vers l'équateur mais s'y heurtent à des zones arides", "Toutes les espèces s'adaptent sur place sans jamais modifier leur aire", "Elles butent sur des sommets en montagne ou sur la mer au nord"], "x": "Les déplacements suivent les gradients altitudinal et latitudinal (Doak & Morris, 2010). En montagne, les espèces déjà à haute altitude disparaissent faute de pouvoir monter plus haut (cas c, diapo 23). En Grande-Bretagne (Parmesan et al., 1999), l'Hespérie du brome ne migre pas et disparaît au sud, tandis que le Tircis migre vers le nord mais risque à terme de buter sur la mer.", "h": "Pense aux espèces de haute montagne et au Tircis qui remonte vers le nord de l'île britannique."}, {"c": 0, "s": 0, "d": "Diapos 25-26", "p": "Quel effet contre-intuitif l'homogénéisation biotique peut-elle produire à l'échelle locale ou régionale ?", "o": ["Une hausse de la richesse spécifique locale tout en banalisant les sites", "Une hausse de l'endémisme local grâce aux nouvelles espèces introduites", "Une baisse systématique de la similarité entre deux sites éloignés", "Une disparition totale des espèces déjà largement distribuées partout"], "x": "L'homogénéisation biotique (« mixeur anthropogénique ») remplace des espèces locales/endémiques par des espèces non indigènes cosmopolites, ce qui augmente la similarité des communautés (diapo 26 : 0,31 → 0,45). Point clé (N.B. diapo 26) : localement, l'arrivée d'espèces exotiques peut augmenter le nombre brut d'espèces (richesse spécifique), masquant la perte d'originalité.", "h": "Lis bien l'encadré vert « N.B. » en bas à droite de la diapo 26."}, {"c": 1, "s": 0, "d": "Diapo 28", "p": "Selon l'IPBES (2019), quel est l'ordre exact des 5 causes directes de perte de biodiversité dans les milieux terrestres et d'eau douce ?", "o": ["1. Climat, 2. Pollutions, 3. Usage des terres, 4. Exploitation, 5. EEE", "1. Usage des terres/mers, 2. Exploitation, 3. Climat, 4. Pollutions, 5. EEE", "1. Exploitation directe, 2. Usage des terres, 3. Climat, 4. EEE, 5. Pollutions", "1. Usage des terres/mers, 2. Climat, 3. Pollutions, 4. Exploitation, 5. EEE"], "x": "Pour les milieux terrestres et d'eau douce, l'ordre IPBES (2019) est : 1. Changements d'utilisation des terres et des mers, 2. Exploitation directe (prélèvements), 3. Changements climatiques, 4. Pollutions, 5. Espèces exotiques envahissantes (EEE). Le climat n'est donc que 3e (même si son poids monte).", "h": "Le changement climatique n'arrive qu'en 3e position derrière l'occupation des sols et les prélèvements."}, {"c": 2, "s": 0, "d": "Diapo 28", "p": "Comment le classement des deux premières causes directes de l'IPBES change-t-il lorsqu'on passe aux milieux marins ?", "o": ["Le changement climatique passe 1er devant les pollutions plastiques", "Les espèces exotiques envahissantes passent 1res devant le climat", "L'exploitation directe passe 1re devant l'usage des terres et mers", "Les pollutions passent 1res devant l'exploitation directe (pêche)"], "x": "Dans les milieux marins, les deux premières causes s'inversent par rapport au terrestre/eau douce : l'exploitation directe (pêche/prélèvements) arrive en n°1, devant les changements d'utilisation des mers et des terres (n°2). Les rangs 3, 4 et 5 restent identiques (climat, pollutions, EEE).", "h": "En mer, la pêche (prélèvement direct) passe devant la transformation des habitats."}, {"c": 3, "s": 0, "d": "Diapos 29 et 31", "p": "D'après l'IPBES (2019), quelle est la forme la plus répandue de changement d'utilisation des terres, et quelle chute de biomasse touche les mammifères sauvages ?", "o": ["L'urbanisation (> 1/3 des terres) et −25 % de biomasse sauvage", "L'exploitation minière (> 1/3 des terres) et −47 % de biomasse", "La sylviculture intensive (> 1/3 des terres) et −23 % de biomasse", "L'expansion agricole (> 1/3 des terres) et −82 % de biomasse"], "x": "Selon l'IPBES, l'expansion agricole est la forme la plus répandue de changement d'utilisation des terres (plus d'un tiers de la superficie terrestre pour cultures et élevage ; confirmé par Maxwell et al. 2016 : 5 407 espèces affectées par l'agriculture). La diapo 29 indique par ailleurs une chute de 82 % de la biomasse mondiale de mammifères sauvages depuis la préhistoire (47 % de déclin des écosystèmes, 25 % d'espèces menacées, 23 % de baisse d'intégrité biotique).", "h": "Regarde le 4e cercle rouge (82 %) de la figure SPM 2 et la citation en gras de la diapo 31."}, {"c": 0, "s": 0, "d": "Diapo 32", "p": "Dans l'exemple du carabe prédateur de graines d'adventices (Bohan et al.), comment passe-t-on d'une fonction écologique à un service écosystémique ?", "o": ["Par la valorisation sociale ou économique qu'y associent les humains", "Par l'augmentation spontanée du nombre d'espèces exotiques au champ", "Par la disparition complète de la diversité compositionnelle initiale", "Par l'application systématique d'herbicides sur les cultures céréalières"], "x": "La prédation des graines par le carabe (Pterostichus melanarius) est une fonction écologique (liée à la diversité fonctionnelle). Elle ne devient un service écosystémique (régulation des adventices, baisse des coûts/pollutions herbicides, sécurisation du rendement) que par la « Social Valuation » : l'attribution par les humains d'une valeur sociale ou financière.", "h": "Regarde la grosse flèche grise « Social Valuation » entre les deux colonnes vertes."}, {"c": 1, "s": 0, "d": "Diapos 33-34", "p": "Dans le schéma du Millennium Ecosystem Assessment (2005), quelle catégorie de services écosystémiques est à la base du fonctionnement de tous les autres ?", "o": ["Les services socioculturels (loisirs, paysages, patrimoine culturel)", "Les services de soutien (sols, cycle de l'eau, nutriments, habitats)", "Les services d'approvisionnement (nourriture, eau douce, fibres)", "Les services de régulation (climat, pollinisation, contrôle érosion)"], "x": "Les services de soutien (habitats et biodiversité, formation et rétention des sols, cycle des éléments nutritifs, cycle de l'eau) sont explicitement définis comme « à la base du fonctionnement de tous les biens et services écologiques » (approvisionnement, régulation, socioculturels), qui soutiennent eux-mêmes le bien-être humain (sécurité, santé, relations sociales, biens matériels).", "h": "C'est le bloc situé tout à gauche du schéma de la diapo 33, qui alimente les trois autres."}];
+const Q=Q0.map(q=>({...q,o:[q.o[q.c],...q.o.filter((_,i)=>i!==q.c)]}));
+const L="ABCD";
+const shuffle=a=>{const r=a.slice();for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]]}return r};
+let st;
+const fresh=()=>({i:0,done:false,ord:Q.map(q=>shuffle([0,1,2,3])),ans:Q.map(()=>null)});
+const card=document.getElementById('card'),cells=document.getElementById('cells'),pos=document.getElementById('pos'),pts=document.getElementById('pts');
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const score=()=>st.ans.filter(a=>a===0).length;
+const answered=()=>st.ans.filter(a=>a!==null).length;
+function bar(){
+  cells.innerHTML=Q.map((q,k)=>{const a=st.ans[k];const c=a===null?(k===st.i&&!st.done?'cur':''):(a===0?'ok':'ko');return `<button class="cell ${q.s?'star':''} ${c}" data-k="${k}" aria-label="Question ${k+1}${q.s?' (diapo ★)':''}"></button>`}).join('');
+  pos.textContent=st.done?'Terminé':`Question ${st.i+1} sur ${Q.length}`;
+  pts.textContent=`${score()} bonne${score()>1?'s':''} réponse${score()>1?'s':''} sur ${answered()}`;
+}
+function ask(){
+  const q=Q[st.i],a=st.ans[st.i],ord=st.ord[st.i];
+  const opts=ord.map((oi,n)=>{let cls='';if(a!==null){if(oi===0)cls='right';else if(oi===a)cls='wrong';else cls='dim'}return `<li><button class="opt ${cls}" data-o="${oi}" ${a!==null?'disabled':''}><span class="k">${L[n]}</span><span>${esc(q.o[oi])}</span></button></li>`}).join('');
+  const fb=a===null?'':`<div class="fb ${a===0?'':'no'}"><strong>${a===0?'Bonne réponse.':'Pas tout à fait. La bonne réponse : '+esc(q.o[0])}</strong><p>${esc(q.x)}</p></div>`;
+  const hint=q.h&&a===null?`<details class="hint"><summary>Un indice ?</summary><p>${esc(q.h)}</p></details>`:'';
+  const last=st.i===Q.length-1;
+  card.innerHTML=`<div class="tag">${q.s?'<span class="st">★</span>':''}${esc(q.d)}</div><h2 class="q">${esc(q.p)}</h2><ul class="opts">${opts}</ul>${hint}${fb}<div class="nav"><button class="btn" id="prev" ${st.i===0?'disabled':''}>Précédente</button><span class="keys">Touches A à D pour répondre, Entrée pour continuer</span><button class="btn main-b" id="next" ${a===null?'disabled':''}>${last?'Voir mon score':'Suivante'}</button></div>`;
+  bar();
+}
+function end(){
+  st.done=true;
+  const s=score(),p=Math.round(s/Q.length*100);
+  const starOk=Q.filter((q,k)=>q.s&&st.ans[k]===0).length,starN=Q.filter(q=>q.s).length;
+  const missed=Q.map((q,k)=>({q,k,a:st.ans[k]})).filter(m=>m.a!==0);
+  const msg=p>=85?'Solide. Relis juste les erreurs ci-dessous.':p>=60?'Bonne base. Reprends les diapos des questions ratées.':'Repasse sur les diapos ★ en priorité, puis refais le QCM.';
+  card.innerHTML=`<div class="score"><div class="ring" style="--p:${p}"><span>${s}/${Q.length}</span></div><div><h2>${msg}</h2><p>${p} % de bonnes réponses.</p>${starN?`<div class="split"><div>Diapos ★<br><b>${starOk} / ${starN}</b></div><div>Reste du cours<br><b>${s-starOk} / ${Q.length-starN}</b></div></div>`:''}</div></div>
+  <div class="review"><h3>${missed.length?'À revoir ('+missed.length+')':'Aucune erreur, bravo.'}</h3>${missed.map(m=>`<div class="rv"><p class="rq">${m.q.s?'★ ':''}${m.k+1}. ${esc(m.q.p)} <span style="color:var(--soft);font-weight:400">(${esc(m.q.d)})</span></p>${m.a===null?'<p class="ra y">Sans réponse</p>':`<p class="ra y">Ta réponse : ${esc(m.q.o[m.a])}</p>`}<p class="ra g">Bonne réponse : ${esc(m.q.o[0])}</p><p class="rx">${esc(m.q.x)}</p></div>`).join('')}</div>
+  <div class="nav"><button class="btn" id="redo-miss" ${missed.length?'':'disabled'}>Refaire mes erreurs</button><button class="btn main-b" id="restart">Recommencer à zéro</button></div>`;
+  bar();
+}
+function pick(o){if(st.done||st.ans[st.i]!==null)return;st.ans[st.i]=o;ask();document.getElementById('next')?.focus()}
+function go(i){st.done=false;st.i=Math.max(0,Math.min(Q.length-1,i));ask();window.scrollTo({top:0,behavior:'smooth'})}
+function next(){if(st.ans[st.i]===null)return;if(st.i===Q.length-1){if(st.ans.includes(null)){go(st.ans.indexOf(null))}else end()}else go(st.i+1)}
+card.addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.o!==undefined)pick(+b.dataset.o);
+  else if(b.id==='next')next();
+  else if(b.id==='prev')go(st.i-1);
+  else if(b.id==='restart'){st=fresh();ask()}
+  else if(b.id==='redo-miss'){const ord=Q.map(()=>shuffle([0,1,2,3]));st.ans=st.ans.map(a=>a===0?0:null);st.ord=ord;st.done=false;go(st.ans.indexOf(null))}
+});
+cells.addEventListener('click',e=>{const b=e.target.closest('.cell');if(b)go(+b.dataset.k)});
+document.addEventListener('keydown',e=>{
+  if(st.done||e.metaKey||e.ctrlKey||e.altKey)return;
+  const n=L.indexOf(e.key.toUpperCase());
+  if(n>=0&&n<4&&e.key.length===1){pick(st.ord[st.i][n]);e.preventDefault()}
+  else if(e.key==='Enter'&&st.ans[st.i]!==null&&!(e.target.closest&&e.target.closest('button'))){next();e.preventDefault()}
+  else if(e.key==='ArrowRight'&&st.ans[st.i]!==null)next();
+  else if(e.key==='ArrowLeft'&&st.i>0)go(st.i-1);
+});
+cells.style.setProperty('--n',Q.length);
+const start=d=>{st=d&&Array.isArray(d.ans)&&d.ans.length===Q.length?d:fresh();st.done?end():ask()};
+start({});
+}
+</script>
+</body>
+</html>

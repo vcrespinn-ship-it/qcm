@@ -1,0 +1,7 @@
+# Ne jamais publier les PDFs ni les fichiers de travail bruts
+*.pdf
+*.txt
+*.png
+*.jpg
+questions.json
+_check_qcm.js

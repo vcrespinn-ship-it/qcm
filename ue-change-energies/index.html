@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QCM UE CHANGE Énergies</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE everyday study tool, calm and clear
+   IDEA a stained histology slide: hematoxylin violet + eosin pink, like the cours' coupes
+   PICTURE the live question card itself, large, with a progress strip of cells
+   COLOUR violet #2b1d6e band, white card, eosin #e2457a accent, teal for right, eosin-red for wrong
+   TYPE Sora 700 titles + Source Sans 3 text
+   LAYOUT violet band with title + progress, card overlapping below; phone: single column */
+:root{color-scheme:light dark;--bg:light-dark(#f6f3fb,#120d26);--card:light-dark(#ffffff,#1d1640);--ink:light-dark(#1a1433,#efeaff);--soft:light-dark(#5c5677,#b5aed3);--line:light-dark(#e2dcef,#352c63);--band:light-dark(#2b1d6e,#1b1250);--eo:#e2457a;--eo-soft:light-dark(#fde6ee,#43183a);--ok:light-dark(#0b7a5f,#4fd1a5);--ok-soft:light-dark(#e2f5ee,#123a30);--ko:light-dark(#c42a4f,#ff7d98);--ko-soft:light-dark(#fde6ea,#46172a)}
+:root[data-theme=light]{color-scheme:light}
+:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:17px/1.55 "Source Sans 3",system-ui,sans-serif;overflow-x:clip}
+.band{background:var(--band);color:#fff;padding:clamp(28px,4vw,52px) max(5vw,16px) 96px}
+.wrap{max-width:860px;margin:0 auto}
+h1{font:700 clamp(30px,5vw,46px)/1.05 Sora,system-ui,sans-serif;letter-spacing:-.02em;margin:0 0 10px;text-wrap:balance}
+.lede{margin:0;color:#d9d2ff;max-width:62ch}
+.lede b{color:#fff}
+.cells{display:grid;grid-template-columns:repeat(var(--n,20),minmax(0,1fr));gap:4px;margin-top:26px}
+.cell{height:12px;border-radius:3px;background:rgba(255,255,255,.18);border:0;padding:0;cursor:pointer}
+.cell.star{box-shadow:inset 0 -3px 0 #ffb6cc}
+.cell.cur{background:#fff}
+.cell.ok{background:#4fd1a5}
+.cell.ko{background:#ff7d98}
+.meta{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:10px;font-size:15px;color:#d9d2ff}
+.main{padding:0 max(5vw,16px) 56px;margin-top:-72px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:clamp(20px,3.5vw,36px);box-shadow:0 10px 30px rgba(20,10,60,.12)}
+.tag{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600;color:var(--soft);margin-bottom:10px}
+.tag .st{color:var(--eo);font-size:16px}
+.q{font:600 clamp(21px,2.6vw,26px)/1.25 Sora,system-ui,sans-serif;letter-spacing:-.01em;margin:0 0 20px;text-wrap:pretty}
+.opts{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.opt{width:100%;display:flex;gap:14px;align-items:flex-start;text-align:left;font:inherit;color:inherit;background:transparent;border:1.5px solid var(--line);border-radius:12px;padding:13px 16px;min-height:52px;cursor:pointer;transition:border-color .15s,background .15s}
+.opt:hover:not([disabled]){border-color:var(--eo);background:var(--eo-soft)}
+.opt:focus-visible,.btn:focus-visible,.cell:focus-visible{outline:3px solid var(--eo);outline-offset:2px}
+.opt .k{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:14px;border:1.5px solid var(--line);color:var(--soft)}
+.opt[disabled]{cursor:default}
+.opt.right{border-color:var(--ok);background:var(--ok-soft)}
+.opt.right .k{background:var(--ok);border-color:var(--ok);color:#fff}
+.opt.wrong{border-color:var(--ko);background:var(--ko-soft)}
+.opt.wrong .k{background:var(--ko);border-color:var(--ko);color:#fff}
+.opt.dim{opacity:.55}
+.hint{margin-top:14px}
+.hint summary{cursor:pointer;color:var(--soft);font-size:15px;font-weight:600}
+.hint p{margin:6px 0 0;color:var(--soft)}
+.fb{margin-top:18px;border-left:4px solid var(--ok);background:var(--ok-soft);border-radius:0 12px 12px 0;padding:14px 18px}
+.fb.no{border-color:var(--ko);background:var(--ko-soft)}
+.fb strong{display:block;margin-bottom:4px}
+.fb p{margin:0}
+.nav{display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between;align-items:center;margin-top:22px}
+.btn{font:600 16px "Source Sans 3",system-ui,sans-serif;border-radius:999px;padding:11px 22px;min-height:46px;cursor:pointer;border:1.5px solid var(--line);background:transparent;color:var(--ink)}
+.btn.main-b{background:var(--eo);border-color:var(--eo);color:#fff}
+.btn[disabled]{opacity:.4;cursor:default}
+.keys{font-size:14px;color:var(--soft)}
+.score{display:grid;grid-template-columns:auto minmax(0,1fr);gap:clamp(18px,4vw,40px);align-items:center}
+.ring{width:clamp(120px,22vw,170px);aspect-ratio:1;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--ok) calc(var(--p)*1%),var(--line) 0)}
+.ring span{width:76%;aspect-ratio:1;border-radius:50%;background:var(--card);display:grid;place-items:center;font:700 clamp(30px,5vw,42px)/1 Sora,sans-serif;white-space:nowrap}
+.score h2{font:700 clamp(26px,3.4vw,34px)/1.1 Sora,sans-serif;margin:0 0 8px;letter-spacing:-.02em}
+.score p{margin:0;color:var(--soft)}
+.split{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px;font-size:15px}
+.split div{border:1px solid var(--line);border-radius:12px;padding:10px 14px}
+.split b{font-size:20px;white-space:nowrap}
+.review{margin-top:28px}
+.review h3{font:700 20px/1.2 Sora,sans-serif;margin:0 0 12px}
+.rv{border-top:1px solid var(--line);padding:14px 0}
+.rv .rq{font-weight:600;margin:0 0 6px}
+.rv .ra{margin:0 0 4px;font-size:15px}
+.rv .ra.y{color:var(--ko)}
+.rv .ra.g{color:var(--ok)}
+.rv .rx{margin:0;color:var(--soft);font-size:15px}
+.foot{max-width:860px;margin:18px auto 0;font-size:14px;color:var(--soft)}
+@media(max-width:600px){.cells{gap:3px}.cell{height:10px}.score{grid-template-columns:minmax(0,1fr);justify-items:start}.split{grid-template-columns:minmax(0,1fr)}.keys{display:none}.nav .btn{flex:1 1 auto}}
+@media(prefers-reduced-motion:no-preference){.card{animation:in .25s ease-out}@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}}
+</style>
+</head>
+<body>
+<header class="band">
+  <div class="wrap">
+    <h1>UE CHANGE : Énergies fossiles ou renouvelables</h1>
+    <p class="lede">Enjeux énergétiques, ordres de grandeur, rendements, CO2 et démarche négaWatt. 22 questions sur les notions clés et conclusions du cours.</p>
+    <div class="cells" id="cells" aria-label="Progression"></div>
+    <div class="meta"><span id="pos"></span><span id="pts"></span></div>
+  </div>
+</header>
+<main class="main">
+  <div class="wrap"><section class="card" id="card" aria-live="polite"></section></div>
+  <p class="foot">Les réponses sont mélangées à chaque lancement et équilibrées en longueur : la plus longue n'est pas plus souvent la bonne. À l'examen, une question peut avoir plusieurs bonnes réponses.</p>
+</main>
+<script>
+{
+const Q0=[{"c": 1, "s": 0, "d": "Diapo 2", "p": "Depuis la révolution industrielle, dans quel ordre historique les sources d'énergie se sont-elles succédé ?", "o": ["Bois → pétrole et gaz → charbon → nucléaire", "Bois → charbon → pétrole et gaz → nucléaire", "Charbon → bois → pétrole et gaz → nucléaire", "Bois → charbon → nucléaire → pétrole et gaz"], "x": "Le cours présente l'enchaînement : bois → charbon → pétrole et gaz → nucléaire (puis potentiellement éolien et solaire). Le charbon a porté la première révolution industrielle avant l'essor massif du pétrole et du gaz au XXe siècle, puis du nucléaire à partir des années 1970.", "h": "Pense à la machine à vapeur avant le moteur à explosion."}, {"c": 0, "s": 0, "d": "Diapo 2", "p": "D'après le graphique de consommation mondiale par habitant (1860–2012, Jancovici), l'arrivée d'une nouvelle source d'énergie :", "o": ["s'additionne aux précédentes sans les faire disparaître", "remplace rapidement la source énergétique majoritaire d'avant", "fait diminuer durablement la consommation totale par habitant", "supprime progressivement l'usage mondial du charbon et du bois"], "x": "Sur le graphique empilé (1860–2012), chaque nouvelle énergie (charbon, pétrole, gaz, hydro, nucléaire) s'empile au-dessus des anciennes : on observe un fort accroissement global de la consommation par personne (de ~1 500 à > 22 000 kWh/hab), et le bois comme le charbon continuent d'être utilisés.", "h": "Observe l'épaisseur de la bande charbon (en bas) jusqu'en 2012."}, {"c": 2, "s": 0, "d": "Diapo 3", "p": "Sur le graphique reliant PIB par habitant et consommation d'énergie par habitant, quelle précaution de lecture est signalée ?", "o": ["Seul l'axe des revenus utilise une échelle linéaire", "Les données ne concernent que les pays européens", "Les deux axes utilisent une échelle logarithmique", "Le PIB par habitant est exprimé en euros constants"], "x": "La diapo porte l'avertissement « /!\\ échelle logarithmique » : chaque graduation multiplie la valeur par 10 (0,1 ; 1 ; 10 ; 100 sur l'axe vertical en milliers de dollars 1990 ; 0,1 à 1 000 BTU/pers sur l'axe horizontal). Un écart visuel identique correspond donc à un rapport multiplicatif et non à une différence constante.", "h": "Regarde les graduations 0,1 – 1 – 10 – 100 sur les deux axes."}, {"c": 3, "s": 0, "d": "Diapo 4", "p": "À quelle inquiétude historique le rapport « The limits of growth » (Meadows, 1971) est-il associé dans le cours ?", "o": ["Le premier rapport mondial du GIEC sur l'effet de serre", "Le déclenchement du premier choc pétrolier international", "La création de la démarche prospective négaWatt en France", "L'alerte du Club de Rome sur les ressources limitées"], "x": "Commandé par le Club de Rome (fondé en 1968), le rapport Meadows de 1971 alerte sur les limites physiques des ressources. Les chocs pétroliers surviennent ensuite en 1973 et 1979 (dépendance énergétique), et le premier rapport du GIEC paraît en 1990 (effet de serre).", "h": "Le titre du rapport parle littéralement de limites de la croissance."}, {"c": 1, "s": 0, "d": "Diapo 4", "p": "Quelles sont les années et localisations exactes des trois accidents nucléaires majeurs cités dans le cours ?", "o": ["1973 aux USA, 1986 en Ukraine et 2011 au Japon", "1979 aux USA, 1986 en Ukraine et 2011 au Japon", "1979 aux USA, 1990 en Ukraine et 2014 au Japon", "1973 aux USA, 1979 en Ukraine et 2011 au Japon"], "x": "Les trois événements cités sont Three Mile Island (USA, 1979), Tchernobyl (Ukraine, 1986) et Fukushima (Japon, 2011). Attention à ne pas confondre 1973 (1er choc pétrolier) avec 1979 (2e choc pétrolier ET Three Mile Island), ni 1990/2014 (rapports du GIEC).", "h": "Three Mile Island a lieu la même année que le second choc pétrolier."}, {"c": 0, "s": 0, "d": "Diapo 5", "p": "Dans le bilan « fossiles vs renouvelables » du cours, quelle limite est spécifiquement reprochée aux énergies renouvelables ?", "o": ["Les substances rares nécessaires pour les équipements", "Une production énergétique forcément très centralisée", "L'épuisement rapide de la ressource primaire locale", "De fortes émissions de gaz à effet de serre à l'usage"], "x": "Le cours nuance l'image « vertueuse » des renouvelables : elles sont inépuisables, peu polluantes et favorisent l'autoproduction/l'autonomie, mais leurs équipements nécessitent des substances rares. À l'inverse, l'épuisement, l'effet de serre, la dépendance et la production très centralisée sont les critiques adressées aux fossiles (et au danger technologique du nucléaire).", "h": "Pense aux matériaux utilisés pour fabriquer panneaux solaires et éoliennes."}, {"c": 2, "s": 0, "d": "Diapo 6", "p": "Selon les définitions du cours, comment se distingue la puissance de l'énergie ?", "o": ["La puissance est le travail permettant un changement d'état", "La puissance est la fraction utile d'une ressource primaire", "La puissance est la quantité d'énergie par unité de temps", "La puissance est la chaleur dégagée par une combustion"], "x": "L'énergie est définie comme « le travail permettant un changement d'état » (chaleur, mouvement, rayonnement électromagnétique). La puissance est la « quantité d'énergie par unité de temps » mise en jeu lors de ce changement d'état (1 W = 1 J/s).", "h": "Regarde l'unité Watt : elle fait intervenir des secondes au dénominateur."}, {"c": 3, "s": 0, "d": "Diapo 6", "p": "Parmi ces équivalences d'unités de puissance, laquelle est exacte selon le cours ?", "o": ["1 Watt = 1 Joule × seconde et 1 CV = 0,750 kW", "1 Watt = 1 Joule/seconde et 1 CV = 1,360 kW", "1 Watt = 1 kWh/seconde et 1 CV = 0,750 kW", "1 Watt = 1 Joule/seconde et 1 CV = 0,750 kW"], "x": "Par définition, 1 W = 1 J/s (une énergie divisée par un temps, pas multipliée). Pour la puissance mécanique, 1 cheval-vapeur (CV) vaut environ 0,750 kW (736 W en valeur exacte, arrondi à 0,750 kW dans le cours ; 1,36 est l'inverse : 1 kW ≈ 1,36 CV).", "h": "Un cheval-vapeur est inférieur à 1 kW."}, {"c": 1, "s": 0, "d": "Diapo 6", "p": "Quelle liste ne contient UNIQUEMENT des unités d'énergie (et aucune unité de puissance) ?", "o": ["Joule, kWh, Watt, btu, tep", "Joule, kWh, calorie, btu, tep", "Joule, kW, calorie, btu, tep", "CV, kWh, calorie, MW, tep"], "x": "Les unités d'énergie citées dans le cours sont le Joule, le kWh, la calorie, le btu et la tep (tonne équivalent pétrole). Le Watt (W, kW, MW…) et le cheval-vapeur (CV) sont des unités de puissance. Attention au piège classique : kW = puissance, kWh = énergie (puissance × temps).", "h": "Écarte toute liste contenant W, kW, MW ou CV."}, {"c": 0, "s": 0, "d": "Diapo 7", "p": "Quels ordres de grandeur de puissance caractérisent un être humain (apport de 2 200 à 2 800 kcal/jour) ?", "o": ["105 à 135 W au total, dont ~75 W en effort modéré", "75 à 105 W au total, dont ~135 W en effort modéré", "700 à 1 500 W au total, dont ~105 W en effort modéré", "220 à 280 W au total, dont ~150 W en effort modéré"], "x": "Un apport quotidien de 2 200 à 2 800 kcal (2 554 à 3 250 Wh/j) équivaut à une puissance moyenne de 105 à 135 W (90 % pour l'entretien, dont jusqu'à 20 % pour le cerveau). En activité physique modérée, la puissance mécanique fournie est d'environ 75 W (0,1 CV). 700 à 1 500 W correspond à une bouilloire, une mobylette ou un radiateur électrique.", "h": "La puissance d'effort physique modéré vaut environ 0,1 CV."}, {"c": 2, "s": 0, "d": "Diapo 7", "p": "À quel équipement correspond une puissance de l'ordre de 1 à 4 MW à terre (et jusqu'à 8 MW en mer) ?", "o": ["Une chaudière industrielle vapeur", "Une tranche de centrale nucléaire", "Une grande éolienne moderne", "Un camion poids-lourd routier"], "x": "Une grande éolienne développe ~1 à 4 MW à terre et ~8 MW en mer. À titre de comparaison dans le cours : poids-lourd / F1 ≈ 225 à 375 kW (300 à 500 CV), chaudière industrielle ≈ 10 à 40 MW, centrale thermique ≈ 500 à 3 000 MW, tranche nucléaire ≈ 700 à 1 450 MW.", "h": "Cet équipement existe en version terrestre et offshore."}, {"c": 3, "s": 0, "d": "Diapo 7", "p": "Quel est l'ordre de grandeur de la puissance d'une centrale nucléaire selon le cours ?", "o": ["500 à 3 000 MW par tranche (2 à 6 tranches par centrale)", "10 à 40 MW par tranche (2 à 6 tranches par centrale)", "225 à 375 kW par tranche (2 à 6 tranches par centrale)", "700 à 1 450 MW par tranche (2 à 6 tranches par centrale)"], "x": "Une centrale nucléaire compte 2 à 6 tranches de 700 à 1 450 MW chacune. Les autres valeurs du cours sont : 500 à 3 000 MW pour une centrale thermique (fioul, charbon), 10 à 40 MW pour une chaudière industrielle, et 225 à 375 kW pour un poids-lourd ou une Formule 1.", "h": "Ne confonds pas la fourchette du nucléaire (par tranche) avec celle du thermique classique."}, {"c": 1, "s": 0, "d": "Diapo 8", "p": "Dans la chaîne « énergie primaire → finale → utile », à quoi correspond exactement l'énergie finale ?", "o": ["L'énergie disponible dans la nature avant toute transformation", "L'énergie consommée par les équipements avant utilisation", "L'énergie convertie exactement dans la fonction finale recherchée", "L'énergie perdue lors du transport et de la production centrale"], "x": "L'énergie primaire est celle disponible dans la nature (pétrole, uranium, vent, soleil). Après les pertes à la production et au transport, on obtient l'énergie finale (livrée et consommée par les équipements : électricité au compteur, carburant à la pompe). Après les pertes à l'utilisation dans l'équipement, il reste l'énergie utile (convertie dans la fonction recherchée : chaleur, lumière, mouvement).", "h": "C'est l'étape intermédiaire : ce que l'utilisateur achète et consomme."}, {"c": 0, "s": 0, "d": "Diapo 9", "p": "Une filière enchaîne deux conversions de rendements R1 = 0,8 et R2 = 0,5. Quels sont le rendement global R et les pertes P ?", "o": ["R = 0,40 (40 %) et pertes P = 0,60 (60 %)", "R = 0,65 (65 %) et pertes P = 0,35 (35 %)", "R = 0,30 (30 %) et pertes P = 0,70 (70 %)", "R = 0,50 (50 %) et pertes P = 0,50 (50 %)"], "x": "Les rendements successifs se multiplient : R = Ec2/Ei = R1 × R2 = 0,8 × 0,5 = 0,40 (40 %). Les pertes valent P = Ep/Ei = 1 − R = 1 − 0,40 = 0,60 (60 %). Pièges classiques : faire la moyenne (0,65), soustraire les rendements (0,30) ou ne retenir que le plus faible (0,50).", "h": "Le rendement global est le produit des rendements intermédiaires."}, {"c": 2, "s": 0, "d": "Diapo 10", "p": "Pourquoi l'éclairage issu d'une centrale à charbon subit-il un cumul de pertes bien plus fort qu'un poêle à bois ?", "o": ["Le charbon libère moins d'énergie thermique par kilo que le bois", "Le réseau 25 000 V perd plus de la moitié du courant transporté", "Il enchaîne 9 conversions (R1 à R9) contre 2 pour le bois", "La vapeur d'eau ne peut pas entraîner une turbine électrique seule"], "x": "Le chauffage au poêle à bois ne comporte que 2 étapes (R = R1·R2 : abattage/transport puis combustion/diffusion). L'éclairage via centrale à charbon enchaîne 9 conversions (R = R1·R2·…·R9 : extraction, combustion/vapeur, turbine, transmission mécanique, génératrice 400 V, élévation 25 000 V, câbles longue distance, abaissement 220 V, ampoule). Multiplier autant de facteurs < 1 fait chuter le rendement global.", "h": "Compare le nombre de termes dans les formules en bleu en bas de la diapo."}, {"c": 3, "s": 0, "d": "Diapo 11", "p": "Sur le bilan énergétique français (263,9 Mtep primaires → 165,4 Mtep finales), quelle filière génère le plus gros bloc de pertes de conversion ?", "o": ["Le raffinage du pétrole brut (80,5 Mtep primaires)", "La distribution du gaz naturel (38,6 Mtep primaires)", "Les renouvelables et déchets (26,7 Mtep primaires)", "La production électronucléaire (110,4 Mtep primaires)"], "x": "Sur le diagramme de Sankey (diapo 11), la bande bleue de la production nucléaire (110,4 Mtep primaires) perd environ 76,4 Mtep en pertes de conversion/usages internes (rendement thermique ~1/3) pour contribuer à 38,0 Mtep d'électricité finale (plus 4,2 Mtep exportés). À l'inverse, le pétrole (80,5 → 73,2 Mtep) et le gaz (38,6 → 33,4 Mtep) subissent beaucoup moins de pertes avant livraison finale.", "h": "Repère la plus large flèche verticale montant vers « Pertes et rendement de conversion »."}, {"c": 1, "s": 0, "d": "Diapo 12", "p": "Comment a évolué l'intensité énergétique finale en France entre 1981 et 2012, et quelles en sont les deux causes citées ?", "o": ["Hausse de 30 % (85 à 122 tep/M€ PIB) due au fret routier massif", "Baisse de 30 % (122 à 85 tep/M€ PIB) via rendements et services", "Baisse de 12 % (122 à 107 tep/M€ PIB) grâce au seul parc nucléaire", "Stagnation autour de 100 tep/M€ PIB malgré les crises économiques"], "x": "En France, il fallait 122 tep par million d'euros de PIB en 1981 contre 85 en 2012 : soit une amélioration (baisse) de 30 % en 30 ans (en moyenne 1,2 %/an). Le cours l'explique par deux facteurs : (1) l'amélioration des rendements de production et d'utilisation industrielle, et (2) la tertiarisation de l'économie (moins énergivore que l'industrie lourde).", "h": "Indice base 100 en 1981 → indice 70 en 2012."}, {"c": 0, "s": 0, "d": "Diapo 13", "p": "Entre 1973 et 2005 (Verny & Pelissard), pourquoi la consommation d'énergie du secteur transport ne baisse-t-elle presque pas malgré des véhicules plus sobres ?", "o": ["L'activité transport (personnes et fret) a crû de +92 %", "Le rendement des moteurs thermiques n'a pas progressé", "La sidérurgie a transféré ses flux vers le rail lourd", "L'agriculture a compensé la baisse des consommations"], "x": "Bien que l'efficacité énergétique s'améliore dans tous les secteurs, la consommation sectorielle résulte du produit (efficacité × volume d'activité). De 1973 à 2005, la forte croissance (+92 %) du transport de personnes et de fret compense les gains de consommation des véhicules. À l'opposé, la sidérurgie chute fortement (fort déclin d'activité), l'industrie décline légèrement, l'agriculture se maintient et le résidentiel-tertiaire progresse.", "h": "C'est un effet rebond / croissance de volume qui annule le gain technique."}, {"c": 2, "s": 0, "d": "Diapo 14", "p": "Lors de la combustion pure, quel est le classement exact du plus émetteur au moins émetteur de CO2 par kWh ?", "o": ["Essence (425 g) > Charbon (269 g) > Gaz (191 g) > H2 (0 g)", "Charbon (425 g) > Gaz (269 g) > Essence (191 g) > H2 (0 g)", "Charbon (425 g) > Essence (269 g) > Gaz (191 g) > H2 (0 g)", "Gaz (425 g) > Charbon (269 g) > Essence (191 g) > H2 (0 g)"], "x": "Pour 1 000 kg brûlés : le charbon donne 9 000 kWh et 3 833 kg CO2 (425 g CO2/kWh) ; l'essence/octane donne 12 000 kWh et 3 228 kg CO2 (269 g CO2/kWh) ; le méthane/gaz naturel donne 15 000 kWh et 2 875 kg CO2 (191 g CO2/kWh) ; le dihydrogène H2 donne 39 000 kWh et 0 g CO2/kWh. Plus le combustible est riche en hydrogène par rapport au carbone, moins il émet de CO2 par kWh.", "h": "Plus une molécule contient d'atomes de H pour un atome de C, moins elle émet de CO2 par kWh."}, {"c": 3, "s": 0, "d": "Diapo 14", "p": "Au-delà de la réaction chimique de combustion, quels deux autres facteurs déterminent l'impact climatique d'un combustible fossile ?", "o": ["La puissance mécanique en CV et la tension du réseau électrique", "La tertiarisation de l'économie et la température régionale moyenne", "Le nombre de tranches de la centrale et les métaux rares employés", "Extraction/raffinage/transport et rendement de l'appareil"], "x": "La diapo 14 ajoute deux postes essentiels à la combustion : (1) l'effet de serre dû aux procédés d'extraction, raffinage et transport du combustible, et (2) le rendement de l'installation de combustion (chaudière, moteur…) : un rendement faible oblige à brûler davantage de combustible pour un même service utile.", "h": "Pense à ce qui se passe en amont du réservoir et dans le moteur/la chaudière."}, {"c": 1, "s": 0, "d": "Diapo 15", "p": "Quels sont les trois piliers de l'approche négaWatt, dans leur ordre logique d'application ?", "o": ["Énergies renouvelables, puis efficacité, puis sobriété", "Sobriété, puis efficacité, puis énergies renouvelables", "Efficacité, puis énergies renouvelables, puis sobriété", "Sobriété, puis énergies renouvelables, puis nucléaire"], "x": "La démarche négaWatt suit un ordre strict illustré par l'éventail (diapo 15) : d'abord la sobriété (réduire les besoins à la source par les comportements), ensuite l'efficacité (réduire l'énergie nécessaire pour un service donné grâce à la technique), et enfin couvrir le besoin résiduel par les énergies renouvelables.", "h": "On commence toujours par éviter de consommer avant d'optimiser puis de produire."}, {"c": 0, "s": 0, "d": "Diapos 16-17", "p": "Selon la prospective négaWatt (horizon 2050) et les conclusions du cours, quelle affirmation est exacte ?", "o": ["Toute énergie a des impacts ; réduire la demande exige sobriété et technique", "Les renouvelables sont sans aucun impact et suffisent sans modifier nos usages", "Le scénario tendanciel divise par deux les besoins d'énergie primaire d'ici 2050", "Les énergies fossiles carbonées n'émettent des GES que pendant leur extraction"], "x": "Les conclusions (diapo 17) rappellent que : (1) toutes les formes d'énergie causent des dommages environnementaux (soit à la production, soit à l'utilisation), et (2) réduire la consommation nécessite des évolutions à la fois comportementales (sobriété) et technologiques (efficacité). En diapo 16, le scénario tendanciel reste stable autour de 3 000 TWh primaires, alors que négaWatt réduit fortement le besoin puis le couvre par les renouvelables.", "h": "Relis les deux derniers points de la diapo Conclusions."}];
+const Q=Q0.map(q=>({...q,o:[q.o[q.c],...q.o.filter((_,i)=>i!==q.c)]}));
+const L="ABCD";
+const shuffle=a=>{const r=a.slice();for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]]}return r};
+let st;
+const fresh=()=>({i:0,done:false,ord:Q.map(q=>shuffle([0,1,2,3])),ans:Q.map(()=>null)});
+const card=document.getElementById('card'),cells=document.getElementById('cells'),pos=document.getElementById('pos'),pts=document.getElementById('pts');
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const score=()=>st.ans.filter(a=>a===0).length;
+const answered=()=>st.ans.filter(a=>a!==null).length;
+function bar(){
+  cells.innerHTML=Q.map((q,k)=>{const a=st.ans[k];const c=a===null?(k===st.i&&!st.done?'cur':''):(a===0?'ok':'ko');return `<button class="cell ${q.s?'star':''} ${c}" data-k="${k}" aria-label="Question ${k+1}${q.s?' (diapo ★)':''}"></button>`}).join('');
+  pos.textContent=st.done?'Terminé':`Question ${st.i+1} sur ${Q.length}`;
+  pts.textContent=`${score()} bonne${score()>1?'s':''} réponse${score()>1?'s':''} sur ${answered()}`;
+}
+function ask(){
+  const q=Q[st.i],a=st.ans[st.i],ord=st.ord[st.i];
+  const opts=ord.map((oi,n)=>{let cls='';if(a!==null){if(oi===0)cls='right';else if(oi===a)cls='wrong';else cls='dim'}return `<li><button class="opt ${cls}" data-o="${oi}" ${a!==null?'disabled':''}><span class="k">${L[n]}</span><span>${esc(q.o[oi])}</span></button></li>`}).join('');
+  const fb=a===null?'':`<div class="fb ${a===0?'':'no'}"><strong>${a===0?'Bonne réponse.':'Pas tout à fait. La bonne réponse : '+esc(q.o[0])}</strong><p>${esc(q.x)}</p></div>`;
+  const hint=q.h&&a===null?`<details class="hint"><summary>Un indice ?</summary><p>${esc(q.h)}</p></details>`:'';
+  const last=st.i===Q.length-1;
+  card.innerHTML=`<div class="tag">${q.s?'<span class="st">★</span>':''}${esc(q.d)}</div><h2 class="q">${esc(q.p)}</h2><ul class="opts">${opts}</ul>${hint}${fb}<div class="nav"><button class="btn" id="prev" ${st.i===0?'disabled':''}>Précédente</button><span class="keys">Touches A à D pour répondre, Entrée pour continuer</span><button class="btn main-b" id="next" ${a===null?'disabled':''}>${last?'Voir mon score':'Suivante'}</button></div>`;
+  bar();
+}
+function end(){
+  st.done=true;
+  const s=score(),p=Math.round(s/Q.length*100);
+  const starOk=Q.filter((q,k)=>q.s&&st.ans[k]===0).length,starN=Q.filter(q=>q.s).length;
+  const missed=Q.map((q,k)=>({q,k,a:st.ans[k]})).filter(m=>m.a!==0);
+  const msg=p>=85?'Solide. Relis juste les erreurs ci-dessous.':p>=60?'Bonne base. Reprends les diapos des questions ratées.':'Repasse sur les diapos ★ en priorité, puis refais le QCM.';
+  card.innerHTML=`<div class="score"><div class="ring" style="--p:${p}"><span>${s}/${Q.length}</span></div><div><h2>${msg}</h2><p>${p} % de bonnes réponses.</p>${starN?`<div class="split"><div>Diapos ★<br><b>${starOk} / ${starN}</b></div><div>Reste du cours<br><b>${s-starOk} / ${Q.length-starN}</b></div></div>`:''}</div></div>
+  <div class="review"><h3>${missed.length?'À revoir ('+missed.length+')':'Aucune erreur, bravo.'}</h3>${missed.map(m=>`<div class="rv"><p class="rq">${m.q.s?'★ ':''}${m.k+1}. ${esc(m.q.p)} <span style="color:var(--soft);font-weight:400">(${esc(m.q.d)})</span></p>${m.a===null?'<p class="ra y">Sans réponse</p>':`<p class="ra y">Ta réponse : ${esc(m.q.o[m.a])}</p>`}<p class="ra g">Bonne réponse : ${esc(m.q.o[0])}</p><p class="rx">${esc(m.q.x)}</p></div>`).join('')}</div>
+  <div class="nav"><button class="btn" id="redo-miss" ${missed.length?'':'disabled'}>Refaire mes erreurs</button><button class="btn main-b" id="restart">Recommencer à zéro</button></div>`;
+  bar();
+}
+function pick(o){if(st.done||st.ans[st.i]!==null)return;st.ans[st.i]=o;ask();document.getElementById('next')?.focus()}
+function go(i){st.done=false;st.i=Math.max(0,Math.min(Q.length-1,i));ask();window.scrollTo({top:0,behavior:'smooth'})}
+function next(){if(st.ans[st.i]===null)return;if(st.i===Q.length-1){if(st.ans.includes(null)){go(st.ans.indexOf(null))}else end()}else go(st.i+1)}
+card.addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.o!==undefined)pick(+b.dataset.o);
+  else if(b.id==='next')next();
+  else if(b.id==='prev')go(st.i-1);
+  else if(b.id==='restart'){st=fresh();ask()}
+  else if(b.id==='redo-miss'){const ord=Q.map(()=>shuffle([0,1,2,3]));st.ans=st.ans.map(a=>a===0?0:null);st.ord=ord;st.done=false;go(st.ans.indexOf(null))}
+});
+cells.addEventListener('click',e=>{const b=e.target.closest('.cell');if(b)go(+b.dataset.k)});
+document.addEventListener('keydown',e=>{
+  if(st.done||e.metaKey||e.ctrlKey||e.altKey)return;
+  const n=L.indexOf(e.key.toUpperCase());
+  if(n>=0&&n<4&&e.key.length===1){pick(st.ord[st.i][n]);e.preventDefault()}
+  else if(e.key==='Enter'&&st.ans[st.i]!==null&&!(e.target.closest&&e.target.closest('button'))){next();e.preventDefault()}
+  else if(e.key==='ArrowRight'&&st.ans[st.i]!==null)next();
+  else if(e.key==='ArrowLeft'&&st.i>0)go(st.i-1);
+});
+cells.style.setProperty('--n',Q.length);
+const start=d=>{st=d&&Array.isArray(d.ans)&&d.ans.length===Q.length?d:fresh();st.done?end():ask()};
+start({});
+}
+</script>
+</body>
+</html>
